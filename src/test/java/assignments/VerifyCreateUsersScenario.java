@@ -7,13 +7,15 @@ import io.restassured.path.json.JsonPath;
 import org.junit.Assert;
 import org.junit.Test;
 import java.util.ArrayList;
-import static io.restassured.RestAssured.baseURI;
-import static io.restassured.RestAssured.given;
+
+import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.equalTo;
 
 public class VerifyCreateUsersScenario {
+
     @Test
-    public void createUsers(){
+    public void createUsers() throws InterruptedException {
+
         //create multiple users
         //https://petstore.swagger.io/v2/user/createWithArray
         baseURI ="https://petstore.swagger.io";
@@ -58,13 +60,15 @@ public class VerifyCreateUsersScenario {
         System.out.println("Checking response after users creation: "+userCreationResponseDetails.toString());
         Assert.assertEquals(200,userCreationResponseDetails.getCode());
 
+
         //verify that above userOne is created using GET method, using username
         String userOneDetails = given().log().all().
-                when().get("/v2/user/"+userNameOne).then().assertThat().log().all().
+                when().get("/v2/user/"+userNameOne).
+                then().assertThat().log().all().
                 body("username",equalTo(userNameOne)).
                 body("firstName",equalTo(userOneDataDetails.getFirstName())).statusCode(200).
                 extract().response().asString();
-
+        Thread.sleep(5000);
         JsonPath userOneDetailsJsonPath = new JsonPath(userOneDetails);
         //verify lastname from response equals to lastname fetched in response of GET method
         String userOnelastName = userOneDetailsJsonPath.getString("lastName");
