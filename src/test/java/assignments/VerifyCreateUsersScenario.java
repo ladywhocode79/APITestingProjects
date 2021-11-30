@@ -2,6 +2,9 @@ package assignments;
 
 import assignments.data.UserCreationResponseDetails;
 import assignments.data.UserDataClass;
+import io.restassured.RestAssured;
+import io.restassured.config.HttpClientConfig;
+import io.restassured.config.RestAssuredConfig;
 import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
 import org.junit.Assert;
@@ -15,7 +18,11 @@ public class VerifyCreateUsersScenario {
 
     @Test
     public void createUsers() throws InterruptedException {
-
+        //to set timeout in restassured
+        RestAssured.config= RestAssuredConfig.config()
+                .httpClient(HttpClientConfig.httpClientConfig()
+                        .setParam("http.socket.timeout",1000)
+                        .setParam("http.connection.timeout", 1000));
         //create multiple users
         //https://petstore.swagger.io/v2/user/createWithArray
         baseURI ="https://petstore.swagger.io";
@@ -68,7 +75,7 @@ public class VerifyCreateUsersScenario {
                 body("username",equalTo(userNameOne)).
                 body("firstName",equalTo(userOneDataDetails.getFirstName())).statusCode(200).
                 extract().response().asString();
-        Thread.sleep(5000);
+        //Thread.sleep(5000);
         JsonPath userOneDetailsJsonPath = new JsonPath(userOneDetails);
         //verify lastname from response equals to lastname fetched in response of GET method
         String userOnelastName = userOneDetailsJsonPath.getString("lastName");
